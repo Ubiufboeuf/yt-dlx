@@ -1,0 +1,15 @@
+{
+  "name": "yt-dlx",
+  "module": "index.ts",
+  "type": "module",
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@stylistic/eslint-plugin": "5.10.0",
+    "@types/bun": "latest",
+    "eslint": "10.11.0",
+    "globals": "17.12.0",
+    "jiti": "2.7.0",
+    "typescript-eslint": "8.71.0",
+    "typescript": "5"
+  }
+}
