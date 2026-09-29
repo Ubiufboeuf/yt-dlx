@@ -1,16 +1,15 @@
 import { spawn } from 'node:child_process'
 import { SubprocessError } from '../errors/SubprocessError'
+import type { SubprocessOptions, SubprocessResult } from '../types/subprocessTypes'
 
-type SubprocessResult = {
-  type: 'success'
-  stdout: string
-  exitCode: number
-} | {
-  type: 'error'
-  error: SubprocessError
+const defaultOptions: SubprocessOptions = {
+  allowedExitCodes: [0],
+  ignoreExitCode: false
 }
 
-export async function asyncSubprocess (command: string, args: string[]): Promise<SubprocessResult> {
+export async function asyncSubprocess (command: string, args: string[], options?: SubprocessOptions): Promise<SubprocessResult> {
+  const { allowedExitCodes, ignoreExitCode } = { ...defaultOptions, ...options }
+  
   return new Promise((resolve, reject) => {
     const child = spawn(command, args)
 
@@ -25,7 +24,7 @@ export async function asyncSubprocess (command: string, args: string[]): Promise
       const stdout = Buffer.concat(stdoutChunks).toString('utf-8')
       const stderr = Buffer.concat(stderrChunks).toString('utf-8')
 
-      const isSuccess = Boolean(stdout)
+      const isSuccess = ignoreExitCode || allowedExitCodes?.includes(exitCode)
 
       if (isSuccess) {
         resolve({ type: 'success', stdout, exitCode })
