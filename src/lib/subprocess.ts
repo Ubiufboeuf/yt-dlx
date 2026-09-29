@@ -8,7 +8,7 @@ const defaultOptions: SubprocessOptions = {
 }
 
 export async function asyncSubprocess (command: string, args: string[], options?: SubprocessOptions): Promise<SubprocessResult> {
-  const { allowedExitCodes, ignoreExitCode, signal } = { ...defaultOptions, ...options }
+  const { allowedExitCodes, ignoreExitCode, cleanOutput, signal } = { ...defaultOptions, ...options }
 
   return new Promise((resolve, reject) => {
     const child = spawn(command, args, { signal })
@@ -27,9 +27,14 @@ export async function asyncSubprocess (command: string, args: string[], options?
     
     child.on('close', (code) => {
       const exitCode = code ?? 0
-      const stdout = Buffer.concat(stdoutChunks).toString('utf-8')
-      const stderr = Buffer.concat(stderrChunks).toString('utf-8')
+      let stdout = Buffer.concat(stdoutChunks).toString('utf-8')
+      let stderr = Buffer.concat(stderrChunks).toString('utf-8')
 
+      if (cleanOutput) {
+        stdout = cleanSubprocessOutput(stdout)
+        stderr = cleanSubprocessOutput(stderr)
+      }
+      
       const isSuccess = ignoreExitCode || allowedExitCodes?.includes(exitCode)
 
       if (isSuccess) {
@@ -55,4 +60,18 @@ export async function asyncSubprocess (command: string, args: string[], options?
       reject(err)
     })
   })
+}
+
+export function cleanSubprocessOutput (rawStdout: string): string {
+  return rawStdout
+    .split('\n')
+    .map((line) => {
+      if (line.includes('\r')) {
+        const segments = line.split('\r').filter(Boolean)
+        return segments[segments.length - 1] ?? ''
+      }
+      return line
+    })
+    .filter((line) => line.trim().length > 0)
+    .join('\n')
 }

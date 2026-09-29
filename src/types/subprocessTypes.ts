@@ -3,6 +3,7 @@ import type { SubprocessError } from '../errors/SubprocessError'
 export interface SubprocessOptions {
   allowedExitCodes?: number[] | null
   ignoreExitCode?: boolean
+  cleanOutput?: boolean
   signal?: AbortSignal
   onStdout?: (data: string) => void
   onStderr?: (data: string) => void
