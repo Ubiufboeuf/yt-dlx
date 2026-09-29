@@ -8,10 +8,10 @@ const defaultOptions: SubprocessOptions = {
 }
 
 export async function asyncSubprocess (command: string, args: string[], options?: SubprocessOptions): Promise<SubprocessResult> {
-  const { allowedExitCodes, ignoreExitCode } = { ...defaultOptions, ...options }
+  const { allowedExitCodes, ignoreExitCode, signal } = { ...defaultOptions, ...options }
   
   return new Promise((resolve, reject) => {
-    const child = spawn(command, args)
+    const child = spawn(command, args, { signal })
 
     const stdoutChunks: Buffer[] = []
     const stderrChunks: Buffer[] = []
@@ -37,8 +37,16 @@ export async function asyncSubprocess (command: string, args: string[], options?
       }
     })
     
-    child.on('error', (error) => {
-      reject(error)
+    child.on('error', (err) => {
+      if (err.name === 'AbortError') {
+        const error = new SubprocessError(
+          'Proceso cancelado por el usuario',
+          { stdout: '', stderr: 'Aborted', exitCode: -1 }
+        )
+        return resolve({ type: 'error', error })
+      }
+
+      reject(err)
     })
   })
 }
