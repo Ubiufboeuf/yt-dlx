@@ -2,8 +2,9 @@ import type { SubprocessOptions } from './subprocessTypes'
 
 export interface DownloadOptions extends SubprocessOptions {
   outputDir?: string
+  outputTemplate?: string
+  restrictFilenames?: boolean | 'URL'
   format?: string
-  quality?: string
 }
 
 export interface DownloadResult {

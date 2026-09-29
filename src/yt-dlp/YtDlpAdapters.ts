@@ -19,6 +19,15 @@ export class YtDlpDownloader implements VideoDownloader {
       args.push('-f', options.format)
     }
 
+    if (options?.outputTemplate) {
+      args.push('-o', options.outputTemplate)
+    }
+
+    if (options?.restrictFilenames) {
+      args.push('--restrict-filenames')
+      if (options.restrictFilenames === 'URL') args.push('--restrict-filenames', 'URL')
+    }
+
     args.push(url)
 
     const result = await asyncSubprocess(this.binaryPath, args, {
