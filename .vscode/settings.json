@@ -2,6 +2,7 @@
   "conventionalCommits.scopes": [
     "dx",
     "lib",
-    "types"
+    "types",
+    "yt-dlp"
   ]
 }
