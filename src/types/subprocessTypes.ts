@@ -4,6 +4,8 @@ export interface SubprocessOptions {
   allowedExitCodes?: number[] | null
   ignoreExitCode?: boolean
   signal?: AbortSignal
+  onStdout?: (data: string) => void
+  onStderr?: (data: string) => void
 }
 
 export type SubprocessResult = {

@@ -9,15 +9,21 @@ const defaultOptions: SubprocessOptions = {
 
 export async function asyncSubprocess (command: string, args: string[], options?: SubprocessOptions): Promise<SubprocessResult> {
   const { allowedExitCodes, ignoreExitCode, signal } = { ...defaultOptions, ...options }
-  
+
   return new Promise((resolve, reject) => {
     const child = spawn(command, args, { signal })
 
     const stdoutChunks: Buffer[] = []
     const stderrChunks: Buffer[] = []
 
-    child.stdout.on('data', (chunk: Buffer) => stdoutChunks.push(chunk))
-    child.stderr.on('data', (chunk: Buffer) => stderrChunks.push(chunk))
+    child.stdout.on('data', (chunk: Buffer) => {
+      stdoutChunks.push(chunk)
+      options?.onStdout?.(chunk.toString('utf-8'))
+    })
+    child.stderr.on('data', (chunk: Buffer) => {
+      stderrChunks.push(chunk)
+      options?.onStderr?.(chunk.toString('utf-8'))
+    })
     
     child.on('close', (code) => {
       const exitCode = code ?? 0
