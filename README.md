@@ -1,15 +1,14 @@
-# yt-kit
+# yt-dlx
 
-To install dependencies:
-
-```bash
-bun install
-```
-
-To run:
+Instalar paquete:
 
 ```bash
-bun run index.ts
-```
+# bun
+bun add -E @yt-dlx/yt
 
-This project was created using `bun init` in bun v1.3.14. [Bun](https://bun.com) is a fast all-in-one JavaScript runtime.
+# pnpm
+pnpm add -E @yt-dlx/yt
+
+# npm
+npm i -E @yt-dlx/yt
+```
