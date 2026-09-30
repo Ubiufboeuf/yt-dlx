@@ -1,9 +1,9 @@
 import { asyncSubprocess } from '../lib/subprocess'
-import type { DownloadOptions, DownloadResult, VideoDownloader } from '../types/downloaderTypes'
-import type { FormatSelector, MediaInspector, VideoFormat } from '../types/metadataTypes'
+import type { DownloadOptions, DownloadResult, MediaDownloader } from '../types/downloaderTypes'
+import type { FormatSelector, MediaInspector, VideoFormat } from '../types/mediaTypes'
 import type { YtDLPDumpedJSON } from './ytDlpTypes'
 
-export class YtDlpDownloader implements VideoDownloader, MediaInspector {
+export class YtDlpDownloader implements MediaDownloader, MediaInspector {
   private binaryPath: string
 
   constructor (binaryPath = 'yt-dlp') {

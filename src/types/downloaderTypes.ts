@@ -12,6 +12,6 @@ export interface DownloadResult {
   rawOutput: string
 }
 
-export interface VideoDownloader {
+export interface MediaDownloader {
   download: (url: string, options?: DownloadOptions) => Promise<DownloadResult>
 }
