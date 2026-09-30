@@ -1,6 +1,6 @@
 import { asyncSubprocess } from '../lib/subprocess'
 import type { DownloadOptions, DownloadResult, VideoDownloader } from '../types/downloaderTypes'
-import type { MediaInspector, VideoFormat } from '../types/metadataTypes'
+import type { FormatSelector, MediaInspector, VideoFormat } from '../types/metadataTypes'
 import type { YtDLPDumpedJSON } from './ytDlpTypes'
 
 export class YtDlpDownloader implements VideoDownloader, MediaInspector {
@@ -76,5 +76,19 @@ export class YtDlpDownloader implements VideoDownloader, MediaInspector {
     }
 
     return formats
+  }
+
+  async getFormat (url: string, selector: FormatSelector): Promise<VideoFormat[] | null> {
+    let formats = await this.getFormats(url)
+    if (!formats.length) return null
+    
+    if (selector.includes('video')) formats = formats.filter((f) => f.vcodec && f.vcodec !== 'none')
+    if (selector.includes('audio')) formats = formats.filter((f) => f.acodec && f.acodec !== 'none')
+    
+    if (selector.includes('best')) return [formats[formats.length - 1]]
+    if (selector.includes('worst')) return [formats[0]]
+    
+    const filtered = formats.filter((f) => f.qualityLabel === selector || f.id === selector || f.resolution === selector)
+    return filtered.length ? filtered : null
   }
 }
