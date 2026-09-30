@@ -3,6 +3,7 @@
     "dx",
     "lib",
     "types",
-    "yt-dlp"
+    "yt-dlp",
+    "engine"
   ]
 }
