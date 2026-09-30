@@ -1,10 +1,25 @@
 {
-  "name": "yt-dlx",
-  "module": "index.ts",
+  "name": "@yt-dlx/yt",
+  "description": "YouTube Media Extractor & Downloader",
+  "version": "0.1.0",
+  "module": "entry.ts",
   "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.js",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "start": "bun index.ts",
-    "dev": "bun --watch index.ts"
+    "dev": "bun --watch index.ts",
+    "build": "bun build.ts && dts-bundle-generator --no-check -o dist/index.d.ts src/index.ts",
+    "prepublishOnly": "bun run build"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
@@ -14,6 +29,10 @@
     "globals": "17.12.0",
     "jiti": "2.7.0",
     "typescript-eslint": "8.71.0",
-    "typescript": "5"
-  }
+    "typescript": "5",
+    "dts-bundle-generator": "9.5.1"
+  },
+  "files": [
+    "dist"
+  ]
 }
