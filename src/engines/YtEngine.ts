@@ -1,4 +1,4 @@
-import type { DownloadResult, MediaDownloader } from '../types/downloaderTypes'
+import type { DownloadOptions, DownloadResult, MediaDownloader } from '../types/downloaderTypes'
 import type { FormatSelector, MediaInspector } from '../types/mediaTypes'
 
 export type YtEngineConfig = 
@@ -19,12 +19,12 @@ export class YtEngine {
     }
   }
 
-  async download (url: string, selector: FormatSelector): Promise<DownloadResult | null> {
+  async download (url: string, selector: FormatSelector, options: Omit<DownloadOptions, 'format'>): Promise<DownloadResult | null> {
     const formats = await this.inspector.getFormat(url, selector)
     if (!formats) return null
 
     const format = formats[formats.length - 1]
-    const result = await this.downloader.download(url, { format: format.id })
+    const result = await this.downloader.download(url, { format: format.id, ...options })
 
     return result
   }
