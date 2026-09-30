@@ -30,6 +30,10 @@ export class YtDlpDownloader implements MediaDownloader, MediaInspector {
       if (options.restrictFilenames === 'URL') args.push('--restrict-filenames', 'URL')
     }
 
+    if (options?.newLine) {
+      args.push('--newline')
+    }
+
     args.push(url)
 
     const result = await asyncSubprocess(this.binaryPath, args, {

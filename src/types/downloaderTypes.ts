@@ -5,6 +5,7 @@ export interface DownloadOptions extends SubprocessOptions {
   outputTemplate?: string
   restrictFilenames?: boolean | 'URL'
   format?: string
+  newLine?: boolean
 }
 
 export interface DownloadResult {
