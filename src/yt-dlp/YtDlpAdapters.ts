@@ -1,3 +1,4 @@
+import { resolve } from 'node:path'
 import { asyncSubprocess } from '../lib/subprocess'
 import type { DownloadOptions, DownloadResult, MediaDownloader } from '../types/downloaderTypes'
 import type { FormatSelector, MediaInspector, VideoFormat } from '../types/mediaTypes'
@@ -47,8 +48,17 @@ export class YtDlpDownloader implements MediaDownloader, MediaInspector {
       throw result.error
     }
 
+    const lines = result.stdout.split('\n')
+    
+    const destinationLine = lines.find((line) => line.startsWith('[download] Destination: '))
+    const destination = destinationLine?.split(':').slice(1).join(':')
+    const filePath = destination ? resolve(destination) : undefined
+
+    const alreadyDownloaded = lines.some((line) => line.includes('has already been downloaded'))
+    
     return {
-      filePath: undefined,
+      alreadyDownloaded,
+      filePath,
       rawOutput: result.stdout
     }
   }

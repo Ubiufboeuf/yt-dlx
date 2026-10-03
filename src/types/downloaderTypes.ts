@@ -9,6 +9,7 @@ export interface DownloadOptions extends SubprocessOptions {
 }
 
 export interface DownloadResult {
+  alreadyDownloaded: boolean
   filePath?: string
   rawOutput: string
 }
