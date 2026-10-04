@@ -102,8 +102,19 @@ export class YtDlpDownloader implements MediaDownloader, MediaInspector {
     let formats = await this.getFormats(url)
     if (!formats.length) return null
     
-    if (selector.includes('video')) formats = formats.filter((f) => f.vcodec && f.vcodec !== 'none')
-    if (selector.includes('audio')) formats = formats.filter((f) => f.acodec && f.acodec !== 'none')
+    if (selector === 'best') {
+      const filtered = formats.filter((f) => f.vcodec !== 'none' && f.acodec !== 'none')
+      const best = filtered[filtered.length - 1]
+      if (best) return [best]
+    }
+
+    if (selector === 'worst') {
+      const filtered = formats.filter((f) => f.acodec === 'none' && !f.qualityLabel?.includes('storyboard'))
+      return [filtered[0]]
+    }
+
+    if (selector.includes('video')) formats = formats.filter((f) => f.vcodec && f.vcodec !== 'none' && !f.qualityLabel?.includes('storyboard'))
+    if (selector.includes('audio')) formats = formats.filter((f) => f.acodec && f.acodec !== 'none' && !f.qualityLabel?.includes('storyboard'))
     
     if (selector.includes('best')) return [formats[formats.length - 1]]
     if (selector.includes('worst')) return [formats[0]]
