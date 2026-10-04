@@ -19,7 +19,7 @@ export class YtEngine {
     }
   }
 
-  async download (url: string, selector: FormatSelector, options: Omit<DownloadOptions, 'format'>): Promise<DownloadResult | null> {
+  async download (url: string, selector: FormatSelector, options?: Omit<DownloadOptions, 'format'>): Promise<DownloadResult | null> {
     const formats = await this.inspector.getFormat(url, selector)
     if (!formats) return null
 
