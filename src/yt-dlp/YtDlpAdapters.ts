@@ -54,7 +54,11 @@ export class YtDlpDownloader implements MediaDownloader, MediaInspector {
     const splitter = alreadyDownloaded ? '[download] ' : '[download] Destination: '
 
     const destinationLine = lines.find((line) => line.startsWith(splitter))
-    const destination = destinationLine?.split(splitter)[1]    
+    let destination = destinationLine?.split(splitter)[1]  
+
+    if (alreadyDownloaded) {
+      destination = destination?.split(' has already been downloaded')[0]
+    }
     
     const filePath = destination ? resolve(destination) : undefined
     
