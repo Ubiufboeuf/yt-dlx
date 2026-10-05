@@ -1,16 +1,25 @@
 import { spawn } from 'node:child_process'
 
-export function spawnStream (command: string, args: string[], signal?: AbortSignal) {
-  const child = spawn(command, args, { signal })
+interface StreamOptions {
+  signal?: AbortSignal
+  std?: 'out' | 'err' | 'mix'
+}
+
+export function spawnStream (command: string, args: string[], options?: StreamOptions) {
+  const child = spawn(command, args, { signal: options?.signal })
 
   const stream = new ReadableStream({
     start (controller) {
       child.stdout.on('data', (chunk: Buffer) => {
-        controller.enqueue(chunk)
+        const std = options?.std
+        if (std === 'out' || std === 'mix' || !std) controller.enqueue(chunk)
+        else  console.log(chunk.toString('utf8'))
       })
 
       child.stderr.on('data', (chunk: Buffer) => {
-        controller.enqueue(chunk)
+        const std = options?.std
+        if (std === 'err' || std === 'mix') controller.enqueue(chunk)
+        else console.error(chunk.toString('utf8'))
       })
 
       child.stdout.on('end', () => {
