@@ -9,12 +9,12 @@ export function spawnStream (command: string, args: string[], signal?: AbortSign
         controller.enqueue(chunk)
       })
 
-      child.stdout.on('end', () => {
-        controller.close()
+      child.stderr.on('data', (chunk: Buffer) => {
+        controller.enqueue(chunk)
       })
 
-      child.stderr.on('data', (err: Buffer) => {
-        console.error('[yt-dlx stderr]:', err.toString('utf-8'))
+      child.stdout.on('end', () => {
+        controller.close()
       })
 
       child.on('error', (err) => {
