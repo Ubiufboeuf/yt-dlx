@@ -1,7 +1,7 @@
 {
   "name": "@yt-dlx/yt",
   "description": "YouTube Media Extractor & Downloader",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "module": "entry.ts",
   "type": "module",
   "main": "./dist/index.js",
