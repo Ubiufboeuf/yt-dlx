@@ -70,12 +70,7 @@ export class YtDlpDownloader implements MediaDownloader, MediaInspector {
   }
 
   async getFormats (url: string, signal?: AbortSignal): Promise<VideoFormat[]> {
-    const result = await asyncSubprocess(this.binaryPath, ['-J', url], { signal })
-    if (result.type === 'error') {
-      throw result.error
-    }
-
-    const json: YtDLPDumpedJSON = JSON.parse(result.stdout)
+    const json = await this.getInfo(url, signal)
     const formats: VideoFormat[] = []
 
     for (const df of json.formats) {
@@ -121,5 +116,15 @@ export class YtDlpDownloader implements MediaDownloader, MediaInspector {
     
     const filtered = formats.filter((f) => f.qualityLabel === selector || f.id === selector || f.resolution === selector)
     return filtered.length ? filtered : null
+  }
+
+  async getInfo (url: string, signal?: AbortSignal): Promise<YtDLPDumpedJSON> {
+    const result = await asyncSubprocess(this.binaryPath, ['-J', url], { signal })
+    if (result.type === 'error') {
+      throw result.error
+    }
+
+    const json: YtDLPDumpedJSON = JSON.parse(result.stdout)
+    return json
   }
 }

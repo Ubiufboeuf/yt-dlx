@@ -24,6 +24,7 @@ type QualityPreset =
 export type FormatSelector = QualityPreset | (string & {})
 
 export interface MediaInspector {
-  getFormats(url: string): Promise<VideoFormat[]>
+  getFormats(url: string, signal?: AbortSignal): Promise<VideoFormat[]>
   getFormat(url: string, selector: string): Promise<VideoFormat[] | null>
+  getInfo(url: string, signal?: AbortSignal): Promise<object>
 }
