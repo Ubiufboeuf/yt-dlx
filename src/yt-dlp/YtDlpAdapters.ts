@@ -114,7 +114,8 @@ export class YtDlpDownloader implements MediaDownloader, MediaInspector {
     if (selector.includes('best')) return [formats[formats.length - 1]]
     if (selector.includes('worst')) return [formats[0]]
     
-    const filtered = formats.filter((f) => f.qualityLabel === selector || f.id === selector || f.resolution === selector)
+    const height = Number(selector.replace('p', ''))
+    const filtered = formats.filter((f) => f.qualityLabel?.includes(selector) || f.resolution === selector || f.height === height)
     return filtered.length ? filtered : null
   }
 
