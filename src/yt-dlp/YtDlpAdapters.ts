@@ -1,7 +1,7 @@
 import { resolve } from 'node:path'
 import { asyncSubprocess } from '../lib/subprocess'
 import type { DownloadOptions, DownloadResult, MediaDownloader } from '../types/downloaderTypes'
-import type { FormatSelector, MediaInspector, VideoFormat } from '../types/mediaTypes'
+import type { FormatSelector, GetInfoOptions, MediaInspector, VideoFormat } from '../types/mediaTypes'
 import type { YtDLPDumpedJSON } from './ytDlpTypes'
 
 export class YtDlpDownloader implements MediaDownloader, MediaInspector {
@@ -70,7 +70,7 @@ export class YtDlpDownloader implements MediaDownloader, MediaInspector {
   }
 
   async getFormats (url: string, signal?: AbortSignal): Promise<VideoFormat[]> {
-    const json = await this.getInfo(url, signal)
+    const json = await this.getInfo(url, { signal })
     const formats: VideoFormat[] = []
 
     for (const df of json.formats) {
@@ -118,8 +118,25 @@ export class YtDlpDownloader implements MediaDownloader, MediaInspector {
     return filtered.length ? filtered : null
   }
 
-  async getInfo (url: string, signal?: AbortSignal): Promise<YtDLPDumpedJSON> {
-    const result = await asyncSubprocess(this.binaryPath, ['-J', url], { signal })
+  async getInfo (url: string, options?: GetInfoOptions): Promise<YtDLPDumpedJSON> {
+    const args: string[] = ['-J', url]
+
+    if (options?.outputDir) {
+      args.push('-P', options.outputDir)
+    }
+
+    if (options?.outputTemplate) {
+      args.push('-o', options.outputTemplate)
+    }
+    
+    if (options?.newLine) {
+      args.push('--newline')
+    }
+    
+    const result = await asyncSubprocess(this.binaryPath, args, {
+      signal: options?.signal
+    })
+    
     if (result.type === 'error') {
       throw result.error
     }

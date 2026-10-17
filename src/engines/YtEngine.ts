@@ -1,5 +1,5 @@
 import type { DownloadOptions, DownloadResult, MediaDownloader } from '../types/downloaderTypes'
-import type { FormatSelector, MediaInspector } from '../types/mediaTypes'
+import type { FormatSelector, GetInfoOptions, MediaInspector } from '../types/mediaTypes'
 
 export type YtEngineConfig = 
   | { adapter: MediaInspector & MediaDownloader }
@@ -27,5 +27,9 @@ export class YtEngine {
     const result = await this.downloader.download(url, { format: format.id, ...options })
 
     return result
+  }
+
+  async getInfo (url: string, options?: GetInfoOptions) {
+    return this.inspector.getInfo(url, options)
   }
 }
