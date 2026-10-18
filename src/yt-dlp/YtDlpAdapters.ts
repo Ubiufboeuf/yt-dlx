@@ -4,6 +4,7 @@ import type { DownloadOptions, DownloadResult, MediaDownloader } from '../types/
 import type { FormatSelector, GetInfoOptions, MediaInspector, VideoFormat } from '../types/mediaTypes'
 import type { YtDLPDumpedJSON } from './ytDlpTypes'
 import type { VideoMetadata, VideoThumbnail } from '../types/videoTypes'
+import { Temporal } from 'temporal-polyfill'
 
 export class YtDlpDownloader implements MediaDownloader, MediaInspector {
   private binaryPath: string
@@ -145,7 +146,7 @@ export class YtDlpDownloader implements MediaDownloader, MediaInspector {
 
     const json: YtDLPDumpedJSON = JSON.parse(result.stdout)
     if (options?.keepItPure) return json as VideoMetadata
-
+    
     const thumbnails: VideoThumbnail[] = []
     json.thumbnails.forEach((t) => (t.height && t.width) && thumbnails.push({ id: t.id, height: t.height, width: t.width, url: t.url }))
     
@@ -172,7 +173,9 @@ export class YtDlpDownloader implements MediaDownloader, MediaInspector {
       categories: json.categories,
       tags: json.tags,
 
-      uploadDate: json.upload_date,
+      uploadDate: json.timestamp
+        ? Temporal.Instant.fromEpochMilliseconds(json.timestamp * 1000).toString()
+        : undefined,
 
       provider: 'yt-dlp'
     }
