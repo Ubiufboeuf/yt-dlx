@@ -3,6 +3,7 @@ import { asyncSubprocess } from '../lib/subprocess'
 import type { DownloadOptions, DownloadResult, MediaDownloader } from '../types/downloaderTypes'
 import type { FormatSelector, GetInfoOptions, MediaInspector, VideoFormat } from '../types/mediaTypes'
 import type { YtDLPDumpedJSON } from './ytDlpTypes'
+import type { VideoMetadata, VideoThumbnail } from '../types/videoTypes'
 
 export class YtDlpDownloader implements MediaDownloader, MediaInspector {
   private binaryPath: string
@@ -70,7 +71,7 @@ export class YtDlpDownloader implements MediaDownloader, MediaInspector {
   }
 
   async getFormats (url: string, signal?: AbortSignal): Promise<VideoFormat[]> {
-    const json = await this.getInfo(url, { signal })
+    const json = await this.getInfo(url, { keepItPure: true, signal }) as YtDLPDumpedJSON
     const formats: VideoFormat[] = []
 
     for (const df of json.formats) {
@@ -119,7 +120,7 @@ export class YtDlpDownloader implements MediaDownloader, MediaInspector {
     return filtered.length ? filtered : null
   }
 
-  async getInfo (url: string, options?: GetInfoOptions): Promise<YtDLPDumpedJSON> {
+  async getInfo (url: string, options?: GetInfoOptions): Promise<VideoMetadata> {
     const args: string[] = ['-J', url]
 
     if (options?.outputDir) {
@@ -143,6 +144,39 @@ export class YtDlpDownloader implements MediaDownloader, MediaInspector {
     }
 
     const json: YtDLPDumpedJSON = JSON.parse(result.stdout)
-    return json
+    if (options?.keepItPure) return json as VideoMetadata
+
+    const thumbnails: VideoThumbnail[] = []
+    json.thumbnails.forEach((t) => (t.height && t.width) && thumbnails.push({ id: t.id, height: t.height, width: t.width, url: t.url }))
+    
+    const metadata: VideoMetadata = {
+      id: json.id,
+      title: json.title,
+      description: json.description,
+      webpageUrl: json.webpage_url,
+
+      thumbnail: json.thumbnail,
+      thumbnails,
+
+      creatorId: json.uploader_id,
+      creatorName: json.uploader,
+      creatorUrl: json.uploader_url,
+
+      duration: json.duration,
+      isLive: json.is_live,
+      wasLive: json.was_live,
+
+      views: json.view_count,
+      likes: json.like_count,
+
+      categories: json.categories,
+      tags: json.tags,
+
+      uploadDate: json.upload_date,
+
+      provider: 'yt-dlp'
+    }
+
+    return metadata
   }
 }
